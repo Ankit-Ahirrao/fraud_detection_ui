@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FraudShield AI - Real-Time Fraud Detection Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0e27;
+      color: #e8eaf6;
+      overflow-x: hidden;
+    }
+    
+    /* Navigation */
+    nav {
+      background: rgba(15, 20, 45, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1.2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(26, 255, 184, 0.1);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1aFFb8, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: #b0bec5;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+    .nav-links a:hover { color: #1affb8; }
+    .cta-btn {
+      background: linear-gradient(135deg, #1affb8, #00d4ff);
+      color: #0a0e27;
+      padding: 0.7rem 1.8rem;
+      border-radius: 25px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+    .cta-btn:hover { transform: translateY(-2px); }
+
+    /* Pages Container */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #0f152d 0%, #1a2456 100%);
+      padding: 8rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(26, 255, 184, 0.15), transparent);
+      top: -200px;
+      right: -200px;
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #fff, #1affb8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.3rem;
+      color: #b0bec5;
+      max-width: 700px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-top: 3rem;
+    }
+    .stat-card {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1affb8;
+    }
+    .stat-label {
+      color: #78909c;
+      margin-top: 0.5rem;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 6rem 3rem;
+      background: #0a0e27;
+    }
+    .features h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #1affb8;
+    }
+    .features-subtitle {
+      text-align: center;
+      color: #78909c;
+      margin-bottom: 4rem;
+      font-size: 1.1rem;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.2);
+      border-radius: 16px;
+      padding: 2.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(26, 255, 184, 0.2);
+    }
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    .feature-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+    .feature-card p {
+      color: #90a4ae;
+      line-height: 1.6;
+    }
+
+    /* Dashboard Container */
+    .dashboard-container {
+      padding: 2rem;
+      background: #0a0e27;
+      min-height: 100vh;
+    }
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .dash-header h1 {
+      font-size: 2rem;
+      color: #1affb8;
+    }
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+    .pulse {
+      width: 12px;
+      height: 12px;
+      background: #00ff88;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-box {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 1.8rem;
+    }
+    .stat-box h3 {
+      font-size: 0.9rem;
+      color: #78909c;
+      font-weight: 500;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-box .value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #1affb8;
+    }
+    .stat-box .change {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      color: #00ff88;
+    }
+    .stat-box .change.negative { color: #ff5252; }
+
+    /* Transaction Feed */
+    .transaction-feed {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .feed-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .feed-header h2 {
+      font-size: 1.5rem;
+      color: #fff;
+    }
+    .filter-btn {
+      background: rgba(26, 255, 184, 0.1);
+      border: 1px solid rgba(26, 255, 184, 0.3);
+      color: #1affb8;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .filter-btn:hover { background: rgba(26, 255, 184, 0.2); }
+
+    .txn-item {
+      background: rgba(15, 21, 45, 0.6);
+      border-left: 4px solid;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .txn-item:hover { background: rgba(26, 38, 86, 0.8); }
+    .txn-item.high { border-left-color: #ff5252; }
+    .txn-item.medium { border-left-color: #ffab40; }
+    .txn-item.low { border-left-color: #1affb8; }
+    
+    .txn-details {
+      flex: 1;
+    }
+    .txn-id {
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+    .txn-meta {
+      color: #78909c;
+      font-size: 0.9rem;
+    }
+    .txn-amount {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1affb8;
+      margin-right: 2rem;
+    }
+    .risk-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+    .risk-badge.high {
+      background: rgba(255, 82, 82, 0.2);
+      color: #ff5252;
+      border: 1px solid #ff5252;
+    }
+    .risk-badge.medium {
+      background: rgba(255, 171, 64, 0.2);
+      color: #ffab40;
+      border: 1px solid #ffab40;
+    }
+    .risk-badge.low {
+      background: rgba(26, 255, 184, 0.2);
+      color: #1affb8;
+      border: 1px solid #1affb8;
+    }
+
+    /* Review Console */
+    .review-console {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      padding: 2rem;
+      background: #0a0e27;
+      min-height: 100vh;
+    }
+    .sidebar-list {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      height: fit-content;
+    }
+    .detail-panel {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 2.5rem;
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(120, 144, 156, 0.2);
+    }
+    .detail-label {
+      color: #78909c;
+      font-weight: 600;
+    }
+    .detail-value {
+      color: #fff;
+      font-weight: 500;
+    }
+    
+    .llm-insight {
+      background: rgba(26, 255, 184, 0.05);
+      border: 1px solid rgba(26, 255, 184, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .llm-insight h3 {
+      color: #1affb8;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .llm-insight p {
+      line-height: 1.8;
+      color: #b0bec5;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .action-buttons button {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .action-buttons button:hover { transform: translateY(-2px); }
+    .btn-approve {
+      background: linear-gradient(135deg, #00ff88, #00d4ff);
+      color: #0a0e27;
+    }
+    .btn-reject {
+      background: linear-gradient(135deg, #ff5252, #ff1744);
+      color: #fff;
+    }
+    .btn-escalate {
+      background: rgba(255, 171, 64, 0.2);
+      border: 2px solid #ffab40;
+      color: #ffab40;
+    }
+
+    /* Analytics Page */
+    .analytics-page {
+      padding: 2rem;
+      background: #0a0e27;
+    }
+    .chart-container {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      min-height: 350px;
+    }
+    .chart-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 300px;
+      color: #78909c;
+      font-size: 1.1rem;
+      border: 2px dashed rgba(120, 144, 156, 0.3);
+      border-radius: 8px;
+    }
+
+    /* Settings Page */
+    .settings-page {
+      padding: 2rem;
+      background: #0a0e27;
+    }
+    .settings-section {
+      background: linear-gradient(135deg, #1a2456, #0f152d);
+      border: 1px solid rgba(26, 255, 184, 0.15);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .settings-section h2 {
+      color: #1affb8;
+      margin-bottom: 1.5rem;
+    }
+    .rule-item {
+      background: rgba(15, 21, 45, 0.6);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toggle {
+      width: 50px;
+      height: 26px;
+      background: #455a64;
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .toggle.active { background: #1affb8; }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: left 0.3s;
+    }
+    .toggle.active::after { left: 27px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.5rem; }
+      .nav-links { display: none; }
+      .review-console { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">FraudShield AI</div>
+    <ul class="nav-links">
+      <li><a onclick="showPage('home')">Home</a></li>
+      <li><a onclick="showPage('dashboard')">Dashboard</a></li>
+      <li><a onclick="showPage('review')">Review Console</a></li>
+      <li><a onclick="showPage('analytics')">Analytics</a></li>
+      <li><a onclick="showPage('settings')">Settings</a></li>
+    </ul>
+    <button class="cta-btn" onclick="showPage('dashboard')">Launch Platform</button>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+    <section class="hero">
+      <h1>Stop Fraud Before It Happens</h1>
+      <p>Enterprise-grade real-time fraud detection powered by AI, ML, and LLM-generated insights. Protect your customers and your bottom line with sub-second decisioning.</p>
+      <button class="cta-btn" onclick="showPage('dashboard')" style="font-size: 1.1rem; padding: 1rem 2.5rem;">Get Started</button>
+      
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-number">₹416M+</div>
+          <div class="stat-label">Fraud Prevented (2024)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">99.2%</div>
+          <div class="stat-label">Detection Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">&lt;50ms</div>
+          <div class="stat-label">Decision Latency</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2>Enterprise Features Built for Scale</h2>
+      <p class="features-subtitle">Powered by Pathway Streaming Engine & Advanced AI</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Real-Time Processing</h3>
+          <p>Analyze transactions in &lt;50ms using Pathway's streaming engine. Instant decisions on every payment—no batch delays.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>LLM-Powered Insights</h3>
+          <p>Industry-first AI-generated fraud reports. Get plain-language explanations for every flagged transaction with full traceability.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Consortium Intelligence</h3>
+          <p>Leverage shared fraud data from 2,700+ institutions. Known bad actors are blocked network-wide in real-time.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Behavioral Analytics</h3>
+          <p>Track customer spending patterns, velocity checks, and device fingerprints. Detect anomalies before they become losses.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Multi-Layer Security</h3>
+          <p>Combine rules engine, ML models, geo-location, and device intelligence for 360° protection across all channels.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Live Dashboards</h3>
+          <p>Monitor fraud trends, false positive rates, and system performance in real-time. Export reports for compliance audits.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div id="dashboard" class="page">
+    <div class="dashboard-container">
+      <div class="dash-header">
+        <h1>Live Monitoring Dashboard</h1>
+        <div class="live-indicator">
+          <div class="pulse"></div>
+          <span>LIVE</span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h3>Transactions/Min</h3>
+          <div class="value">1,247</div>
+          <div class="change">+8.3% from avg</div>
+        </div>
+        <div class="stat-box">
+          <h3>Fraud Blocked Today</h3>
+          <div class="value">₹1.2M</div>
+          <div class="change">37 transactions</div>
+        </div>
+        <div class="stat-box">
+          <h3>Active Alerts</h3>
+          <div class="value">23</div>
+          <div class="change negative">Requires Review</div>
+        </div>
+        <div class="stat-box">
+          <h3>False Positive Rate</h3>
+          <div class="value">2.1%</div>
+          <div class="change">-0.4% this week</div>
+        </div>
+      </div>
+
+      <div class="transaction-feed">
+        <div class="feed-header">
+          <h2>Recent Flagged Transactions</h2>
+          <button class="filter-btn">Filter: All Risks</button>
+        </div>
+
+        <div class="txn-item high" onclick="showPage('review')">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89274B</div>
+            <div class="txn-meta">Card ending 8592 • 2 Dec 2025, 12:45 PM • Online Payment</div>
+          </div>
+          <div class="txn-amount">₹87,500</div>
+          <div class="risk-badge high">High Risk</div>
+        </div>
+
+        <div class="txn-item medium" onclick="showPage('review')">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89261C</div>
+            <div class="txn-meta">Card ending 1190 • 2 Dec 2025, 11:22 AM • POS Terminal</div>
+          </div>
+          <div class="txn-amount">₹32,100</div>
+          <div class="risk-badge medium">Medium Risk</div>
+        </div>
+
+        <div class="txn-item high" onclick="showPage('review')">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89253D</div>
+            <div class="txn-meta">UPI ID: user@bank • 2 Dec 2025, 10:18 AM • Mobile Transfer</div>
+          </div>
+          <div class="txn-amount">₹1,15,000</div>
+          <div class="risk-badge high">High Risk</div>
+        </div>
+
+        <div class="txn-item low" onclick="showPage('review')">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89244E</div>
+            <div class="txn-meta">Card ending 9044 • 1 Dec 2025, 9:55 PM • ATM Withdrawal</div>
+          </div>
+          <div class="txn-amount">₹8,900</div>
+          <div class="risk-badge low">Low Risk</div>
+        </div>
+
+        <div class="txn-item medium" onclick="showPage('review')">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89201F</div>
+            <div class="txn-meta">Card ending 3421 • 1 Dec 2025, 8:12 PM • E-commerce</div>
+          </div>
+          <div class="txn-amount">₹45,200</div>
+          <div class="risk-badge medium">Medium Risk</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW CONSOLE PAGE -->
+  <div id="review" class="page">
+    <div class="review-console">
+      <div class="sidebar-list">
+        <h2 style="margin-bottom: 1.5rem; color: #1affb8;">Pending Reviews</h2>
+        <div class="txn-item high" onclick="loadTransaction(1)">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89274B</div>
+            <div class="txn-meta">₹87,500 • High Risk</div>
+          </div>
+        </div>
+        <div class="txn-item medium" onclick="loadTransaction(2)">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89261C</div>
+            <div class="txn-meta">₹32,100 • Medium</div>
+          </div>
+        </div>
+        <div class="txn-item high" onclick="loadTransaction(3)">
+          <div class="txn-details">
+            <div class="txn-id">TXN #A89253D</div>
+            <div class="txn-meta">₹1,15,000 • High Risk</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-panel" id="detail-panel">
+        <h2 style="margin-bottom: 2rem; color: #fff;">Transaction Details</h2>
+        
+        <div class="detail-row">
+          <div class="detail-label">Transaction ID</div>
+          <div class="detail-value" id="txn-id">TXN #A89274B</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Timestamp</div>
+          <div class="detail-value" id="timestamp">2 Dec 2025, 12:45:23 PM IST</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Channel</div>
+          <div class="detail-value" id="channel">Online Payment (HTTPS)</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Amount</div>
+          <div class="detail-value" id="amount">₹87,500</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Card/Account</div>
+          <div class="detail-value" id="card">**** **** **** 8592</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Customer</div>
+          <div class="detail-value" id="customer">Amit Kumar Singh | New Delhi</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Merchant</div>
+          <div class="detail-value" id="merchant">TechGadgets.in (MCC: 5732)</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Device IP</div>
+          <div class="detail-value" id="device-ip">92.63.197.45 (Moscow, Russia)</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Risk Score</div>
+          <div class="detail-value" id="risk-score"><span style="color: #ff5252; font-weight: 700;">92/100 - High Risk</span></div>
+        </div>
+
+        <div class="llm-insight">
+          <h3>🤖 AI Fraud Analysis Report</h3>
+          <p id="llm-text">
+            <strong>Critical anomaly detected.</strong> This transaction exhibits multiple high-risk indicators:<br><br>
+            
+            <strong>1. Geographic Mismatch (High Severity):</strong> Customer's registered address is New Delhi, India, but this transaction originated from Moscow, Russia (IP: 92.63.197.45). No travel notifications or prior international transactions on record.<br><br>
+            
+            <strong>2. Amount Anomaly (High Severity):</strong> Transaction value of ₹87,500 is 8.3x higher than customer's average transaction value (₹10,500). Historical spending pattern shows 98% of transactions are below ₹25,000.<br><br>
+            
+            <strong>3. Device Fingerprint Mismatch (Medium Severity):</strong> Device fingerprint (Browser: Firefox 121, OS: Windows 11) does not match any of the customer's previously registered devices. Customer typically uses Chrome on Android.<br><br>
+            
+            <strong>4. Consortium Intelligence Flag:</strong> The originating IP address has been flagged 3 times in the past 48 hours by other institutions in our fraud network for suspected credential theft attacks.<br><br>
+            
+            <strong>Recommendation:</strong> <span style="color: #ff5252; font-weight: 700;">IMMEDIATE BLOCK</span>. High confidence of account takeover fraud. Notify customer via registered phone number and email. Initiate card replacement protocol.
+          </p>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-approve" onclick="alert('Transaction Approved')">✓ Approve Transaction</button>
+          <button class="btn-reject" onclick="alert('Transaction Blocked & Customer Notified')">✗ Block & Alert Customer</button>
+          <button class="btn-escalate" onclick="alert('Escalated to Senior Analyst')">⚠ Escalate to L2</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div id="analytics" class="page">
+    <div class="analytics-page">
+      <h1 style="margin-bottom: 2rem; color: #1affb8;">Analytics & Reporting</h1>
+
+      <div class="chart-container">
+        <h2 style="margin-bottom: 1rem;">Fraud Detection Trend (Last 30 Days)</h2>
+        <div class="chart-placeholder">
+          📊 Chart: Line graph showing daily fraud attempts vs. blocked transactions<br>
+          (Connect your backend to render Chart.js/D3.js visualizations)
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <h2 style="margin-bottom: 1rem;">Top Fraud Vectors</h2>
+        <div class="chart-placeholder">
+          📊 Chart: Pie chart showing distribution - Account Takeover (42%), Card Not Present (31%), Synthetic Identity (18%), Other (9%)
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;">
+        <div class="chart-container">
+          <h2 style="margin-bottom: 1rem;">Channel Breakdown</h2>
+          <div class="chart-placeholder" style="height: 200px;">
+            📊 Bar Chart: Online (45%), POS (30%), Mobile (18%), ATM (7%)
+          </div>
+        </div>
+        <div class="chart-container">
+          <h2 style="margin-bottom: 1rem;">Geographic Hotspots</h2>
+          <div class="chart-placeholder" style="height: 200px;">
+            🗺️ Heatmap: Fraud origin countries
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="settings" class="page">
+    <div class="settings-page">
+      <h1 style="margin-bottom: 2rem; color: #1affb8;">System Configuration</h1>
+
+      <div class="settings-section">
+        <h2>Fraud Detection Rules</h2>
+        <p style="color: #78909c; margin-bottom: 1.5rem;">Enable or disable specific detection rules. Changes apply instantly to the streaming pipeline.</p>
+        
+        <div class="rule-item">
+          <div>
+            <strong>Velocity Check</strong><br>
+            <span style="color: #78909c; font-size: 0.9rem;">Flag transactions exceeding 5 per hour from same card</span>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+
+        <div class="rule-item">
+          <div>
+            <strong>Geographic Anomaly Detection</strong><br>
+            <span style="color: #78909c; font-size: 0.9rem;">Block transactions from countries with no prior history</span>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+
+        <div class="rule-item">
+          <div>
+            <strong>High-Value Transaction Threshold</strong><br>
+            <span style="color: #78909c; font-size: 0.9rem;">Auto-review transactions above ₹50,000</span>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+
+        <div class="rule-item">
+          <div>
+            <strong>Device Fingerprint Matching</strong><br>
+            <span style="color: #78909c; font-size: 0.9rem;">Flag transactions from unrecognized devices</span>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+
+        <div class="rule-item">
+          <div>
+            <strong>Consortium Blacklist Check</strong><br>
+            <span style="color: #78909c; font-size: 0.9rem;">Cross-reference with network-wide fraud database</span>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>Notification Preferences</h2>
+        <div class="rule-item">
+          <div>
+            <strong>Email Alerts for High-Risk Transactions</strong>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="rule-item">
+          <div>
+            <strong>SMS Alerts for System Downtime</strong>
+          </div>
+          <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h2>API Integration</h2>
+        <p style="color: #78909c; margin-bottom: 1rem;">Connect FraudShield AI to your existing systems via REST API or webhooks.</p>
+        <button class="cta-btn">View API Documentation</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+    }
+
+    function loadTransaction(id) {
+      const transactions = [
+        {
+          id: 'TXN #A89274B',
+          timestamp: '2 Dec 2025, 12:45:23 PM IST',
+          channel: 'Online Payment (HTTPS)',
+          amount: '₹87,500',
+          card: '**** **** **** 8592',
+          customer: 'Amit Kumar Singh | New Delhi',
+          merchant: 'TechGadgets.in (MCC: 5732)',
+          ip: '92.63.197.45 (Moscow, Russia)',
+          risk: '<span style="color: #ff5252; font-weight: 700;">92/100 - High Risk</span>',
+          llm: '<strong>Critical anomaly detected.</strong> This transaction exhibits multiple high-risk indicators:<br><br><strong>1. Geographic Mismatch (High Severity):</strong> Customer\'s registered address is New Delhi, India, but this transaction originated from Moscow, Russia (IP: 92.63.197.45). No travel notifications or prior international transactions on record.<br><br><strong>2. Amount Anomaly (High Severity):</strong> Transaction value of ₹87,500 is 8.3x higher than customer\'s average transaction value (₹10,500). Historical spending pattern shows 98% of transactions are below ₹25,000.<br><br><strong>3. Device Fingerprint Mismatch (Medium Severity):</strong> Device fingerprint (Browser: Firefox 121, OS: Windows 11) does not match any of the customer\'s previously registered devices. Customer typically uses Chrome on Android.<br><br><strong>4. Consortium Intelligence Flag:</strong> The originating IP address has been flagged 3 times in the past 48 hours by other institutions in our fraud network for suspected credential theft attacks.<br><br><strong>Recommendation:</strong> <span style="color: #ff5252; font-weight: 700;">IMMEDIATE BLOCK</span>. High confidence of account takeover fraud. Notify customer via registered phone number and email. Initiate card replacement protocol.'
+        },
+        {
+          id: 'TXN #A89261C',
+          timestamp: '2 Dec 2025, 11:22:08 AM IST',
+          channel: 'POS Terminal',
+          amount: '₹32,100',
+          card: '**** **** **** 1190',
+          customer: 'Shruti Yadav | Mumbai',
+          merchant: 'Elite Fashion Store (MCC: 5651)',
+          ip: 'N/A (Physical Terminal)',
+          risk: '<span style="color: #ffab40; font-weight: 700;">71/100 - Medium Risk</span>',
+          llm: '<strong>Moderate anomaly detected.</strong> Transaction shows velocity pattern deviation:<br><br><strong>1. Transaction Velocity (Medium Severity):</strong> Customer has made 3 transactions totaling ₹68,000 in the past 2 hours. Typical behavior shows maximum 2 transactions per day with average total of ₹15,000.<br><br><strong>2. Amount Pattern:</strong> Current transaction of ₹32,100 is within the customer\'s historical range but combined with recent activity suggests possible card testing behavior.<br><br><strong>3. Location Consistency:</strong> All transactions are within Mumbai metro area, consistent with customer\'s profile. No geographic red flags.<br><br><strong>Recommendation:</strong> <span style="color: #ffab40; font-weight: 700;">HOLD FOR VERIFICATION</span>. Send SMS verification code to registered mobile number. If customer confirms within 5 minutes, approve transaction. Otherwise, block and initiate manual review.'
+        },
+        {
+          id: 'TXN #A89253D',
+          timestamp: '2 Dec 2025, 10:18:45 AM IST',
+          channel: 'Mobile UPI Transfer',
+          amount: '₹1,15,000',
+          card: 'UPI: customer@bankname',
+          customer: 'Rajesh Patel | Ahmedabad',
+          merchant: 'P2P Transfer to merchant@paytm',
+          ip: '157.43.12.89 (Ahmedabad, India)',
+          risk: '<span style="color: #ff5252; font-weight: 700;">88/100 - High Risk</span>',
+          llm: '<strong>High-value anomaly with social engineering indicators.</strong><br><br><strong>1. Amount Anomaly (Critical):</strong> Transaction amount of ₹1,15,000 is the highest single transaction ever recorded for this customer. Previous maximum was ₹22,000. This represents a 423% deviation from normal behavior.<br><br><strong>2. Recipient Risk Profile:</strong> The beneficiary UPI ID (merchant@paytm) has been flagged 12 times in the past week by our consortium for suspected involvement in advance-fee fraud schemes.<br><br><strong>3. Behavioral Pattern:</strong> Customer attempted this transaction 3 times in quick succession (each declined due to insufficient balance), then immediately deposited ₹1,20,000 cash at a branch before retrying. This pattern is consistent with social engineering attacks where victims are coached to "unlock" their accounts.<br><br><strong>4. Time-of-Day Anomaly:</strong> Customer has never initiated transactions above ₹10,000 during morning hours (6 AM - 12 PM) in 3 years of account history.<br><br><strong>Recommendation:</strong> <span style="color: #ff5252; font-weight: 700;">IMMEDIATE BLOCK</span>. High confidence of social engineering fraud. Place 24-hour hold on account. Initiate mandatory in-person branch verification before allowing high-value transfers. File Suspicious Activity Report (SAR) with regulatory authorities.'
+        }
+      ];
+
+      const txn = transactions[id - 1];
+      document.getElementById('txn-id').textContent = txn.id;
+      document.getElementById('timestamp').textContent = txn.timestamp;
+      document.getElementById('channel').textContent = txn.channel;
+      document.getElementById('amount').textContent = txn.amount;
+      document.getElementById('card').textContent = txn.card;
+      document.getElementById('customer').textContent = txn.customer;
+      document.getElementById('merchant').textContent = txn.merchant;
+      document.getElementById('device-ip').textContent = txn.ip;
+      document.getElementById('risk-score').innerHTML = txn.risk;
+      document.getElementById('llm-text').innerHTML = txn.llm;
+    }
+  </script>
+
+</body>
+</html>
+
